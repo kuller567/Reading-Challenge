@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Читательский дневник | Рейтинг книг</title>
+  <style>
+    /* ========== ГЛОБАЛЬНЫЕ СТИЛИ ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: system-ui, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(145deg, #f5f7fc 0%, #eef2f5 100%);
+      min-height: 100vh;
+      padding: 24px 16px;
+    }
+
+    .app-container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(2px);
+      border-radius: 32px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.02);
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      transition: all 0.2s ease;
+      border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    h1 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #1e2a3e, #2c3e50);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+      margin-bottom: 8px;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1e2a3e;
+      border-left: 5px solid #3b82f6;
+      padding-left: 16px;
+      margin-bottom: 20px;
+    }
+
+    h3 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #2c3e50;
+      font-size: 0.9rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      font-size: 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 20px;
+      background: white;
+      transition: 0.2s;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+    }
+
+    button {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    button:hover {
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(59,130,246,0.3);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #cbd5e1;
+      color: #1e293b;
+      box-shadow: none;
+    }
+
+    .btn-outline:hover {
+      background: #f1f5f9;
+      border-color: #3b82f6;
+      transform: none;
+      box-shadow: none;
+    }
+
+    /* Вкладки для входа/регистрации */
+    .tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .tab-btn {
+      background: transparent;
+      color: #64748b;
+      box-shadow: none;
+      width: auto;
+      padding: 10px 20px;
+      border-radius: 40px 40px 0 0;
+      font-weight: 600;
+    }
+    .tab-btn.active {
+      color: #3b82f6;
+      border-bottom: 3px solid #3b82f6;
+      background: transparent;
+      transform: none;
+      box-shadow: none;
+    }
+    .tab-btn:hover {
+      background: #f1f5f9;
+      transform: none;
+      color: #1e293b;
+    }
+    .auth-form {
+      transition: 0.2s;
+    }
+    .hidden-form {
+      display: none;
+    }
+
+    .dashboard-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 28px;
+    }
+
+    .col {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .ranking-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ranking-table th, .ranking-table td {
+      padding: 12px 8px;
+      text-align: left;
+      border-bottom: 1px solid #eef2f5;
+    }
+
+    .ranking-table th {
+      font-weight: 700;
+      color: #3b82f6;
+      font-size: 0.85rem;
+    }
+
+    .rank-number {
+      font-weight: 700;
+      color: #4b5563;
+      width: 40px;
+    }
+
+    .book-list {
+      background: #f8fafc;
+      border-radius: 24px;
+      padding: 8px 0;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+
+    .book-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      border-bottom: 1px solid #e2edf2;
+    }
+
+    .book-info {
+      font-size: 0.9rem;
+    }
+
+    .book-title {
+      font-weight: 600;
+    }
+
+    .book-pages {
+      background: #e0e7ff;
+      padding: 2px 10px;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .stats-card {
+      background: linear-gradient(120deg, #eef2ff, #ffffff);
+      border-radius: 28px;
+      padding: 18px 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .stats-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #1e293b;
+    }
+
+    .stats-label {
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-size: 0.85rem;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .success-msg {
+      color: #10b981;
+      font-size: 0.85rem;
+      margin-top: 8px;
+    }
+
+    .user-greeting {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .logout-btn {
+      width: auto;
+      background: #ef4444;
+      padding: 8px 20px;
+      font-size: 0.85rem;
+    }
+
+    .logout-btn:hover {
+      background: #dc2626;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #94a3b8;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 780px) {
+      .card { padding: 18px; }
+      h1 { font-size: 1.6rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <!-- ==================== СЕКЦИЯ АВТОРИЗАЦИИ (ВХОД / РЕГИСТРАЦИЯ) ==================== -->
+  <div id="authSection" class="card">
+    <h1>📚 Читательский клуб</h1>
+    <p style="margin-bottom: 24px; color: #334155;">Войдите или создайте аккаунт, чтобы отслеживать прогресс</p>
+    
+    <!-- Вкладки -->
+    <div class="tabs">
+      <button id="tabLoginBtn" class="tab-btn active">🔐 Вход</button>
+      <button id="tabRegisterBtn" class="tab-btn">📝 Регистрация</button>
+    </div>
+
+    <!-- Форма ВХОДА -->
+    <div id="loginFormBlock" class="auth-form">
+      <form id="loginForm">
+        <div class="form-group">
+          <label>👤 Имя пользователя</label>
+          <input type="text" id="loginName" placeholder="Ваше имя" required autocomplete="off">
+        </div>
+        <button type="submit">Войти в дневник</button>
+        <div id="loginError" class="error-msg" style="margin-top: 12px;"></div>
+      </form>
+    </div>
+
+    <!-- Форма РЕГИСТРАЦИИ (скрыта по умолчанию) -->
+    <div id="registerFormBlock" class="auth-form hidden-form">
+      <form id="registerForm">
+        <div class="form-group">
+          <label>👤 Имя пользователя</label>
+          <input type="text" id="regName" placeholder="например, Алексей" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label>🏫 Класс / Группа</label>
+          <input type="text" id="regClass" placeholder="например, 9А" required autocomplete="off">
+        </div>
+        <button type="submit">Создать аккаунт</button>
+        <div id="regError" class="error-msg" style="margin-top: 12px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== ОСНОВНОЕ ПРИЛОЖЕНИЕ (после входа) ==================== -->
+  <div id="appSection" style="display: none;">
+    <div class="card" style="padding: 16px 24px;">
+      <div class="user-greeting">
+        <div>
+          <strong style="font-size: 1.2rem;">📖 Привет, <span id="currentUserName">...</span></strong>
+          <span style="margin-left: 12px; background: #e2e8f0; padding: 4px 12px; border-radius: 50px; font-size: 0.8rem;" id="currentUserClass">—</span>
+        </div>
+        <button id="logoutBtn" class="logout-btn">🚪 Выйти</button>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="col">
+        <div class="card">
+          <h2>➕ Добавить книгу</h2>
+          <form id="addBookForm">
+            <div class="form-group">
+              <label>📖 Название</label>
+              <input type="text" id="bookTitle" placeholder="Война и мир" required>
+            </div>
+            <div class="form-group">
+              <label>✍️ Автор</label>
+              <input type="text" id="bookAuthor" placeholder="Лев Толстой" required>
+            </div>
+            <div class="form-group">
+              <label>📄 Количество страниц</label>
+              <input type="number" id="bookPages" placeholder="1225" min="1" required>
+            </div>
+            <button type="submit">Сохранить книгу</button>
+            <div id="addBookMsg" class="error-msg"></div>
+          </form>
+        </div>
+
+        <div class="card">
+          <h2>🎯 Мой прогресс</h2>
+          <div class="stats-card">
+            <div class="stats-number" id="totalBooksCount">0</div>
+            <div class="stats-label">прочитанных книг</div>
+          </div>
+          <div class="stats-card">
+            <div class="stats-number" id="totalPagesCount">0</div>
+            <div class="stats-label">всего страниц</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📚 Мои книги</h3>
+          <div id="booksListContainer" class="book-list">
+            <div style="padding: 16px; text-align: center; color: #6c757d;">Нет добавленных книг</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card">
+          <h2>🏆 Топ10 читателей</h2>
+          <div style="overflow-x: auto;">
+            <table class="ranking-table" id="topRankingTable">
+              <thead><tr><th>#</th><th>Участник</th><th>Класс</th><th>Страниц</th></tr></thead>
+              <tbody id="rankingBody"><tr><td colspan="4" style="text-align: center;">Загрузка...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer>📌 Данные сохраняются в вашем браузере (localStorage). Вход для старых участников — используйте своё имя.</footer>
+</div>
+
+<script>
+  // ==================== КЛЮЧИ ХРАНИЛИЩА ====================
+  const STORAGE_USERS = "reading_app_users";
+  const STORAGE_BOOKS = "reading_app_books";
+  const STORAGE_CURRENT_USER = "reading_app_current_user";
+
+  // ==================== ГЛОБАЛЬНЫЕ ДАННЫЕ ====================
+  let users = [];
+  let books = [];
+  let currentUserId = null;
+
+  // ==================== ЗАГРУЗКА / СОХРАНЕНИЕ ====================
+  function loadDataFromStorage() {
+    const storedUsers = localStorage.getItem(STORAGE_USERS);
+    users = storedUsers ? JSON.parse(storedUsers) : [];
+
+    const storedBooks = localStorage.getItem(STORAGE_BOOKS);
+    books = storedBooks ? JSON.parse(storedBooks) : [];
+
+    const storedCurrent = localStorage.getItem(STORAGE_CURRENT_USER);
+    if (storedCurrent && users.some(u => u.id === storedCurrent)) {
+      currentUserId = storedCurrent;
+    } else {
+      currentUserId = null;
+      localStorage.removeItem(STORAGE_CURRENT_USER);
+    }
+  }
+
+  function saveUsersToStorage() { localStorage.setItem(STORAGE_USERS, JSON.stringify(users)); }
+  function saveBooksToStorage() { localStorage.setItem(STORAGE_BOOKS, JSON.stringify(books)); }
+  function saveCurrentUserToStorage() {
+    if (currentUserId) localStorage.setItem(STORAGE_CURRENT_USER, currentUserId);
+    else localStorage.removeItem(STORAGE_CURRENT_USER);
+  }
+
+  // ==================== БИЗНЕС-ЛОГИКА ====================
+  // Регистрация нового пользователя (имя уникально)
+  function registerUser(name, className) {
+    if (!name.trim() || !className.trim()) throw new Error("Имя и класс не могут быть пустыми.");
+    const normalizedName = name.trim();
+    const isExist = users.some(u => u.name.toLowerCase() === normalizedName.toLowerCase());
+    if (isExist) throw new Error("Пользователь с таким именем уже существует. Выполните вход.");
+    const newId = Date.now().toString() + Math.random().toString(36).substring(2, 6);
+    const newUser = { id: newId, name: normalizedName, class: className.trim() };
+    users.push(newUser);
+    saveUsersToStorage();
+    return newUser;
+  }
+
+  // Вход существующего пользователя по имени (регистронезависимо)
+  function loginUser(name) {
+    if (!name.trim()) throw new Error("Введите имя пользователя.");
+    const normalizedName = name.trim();
+    const foundUser = users.find(u => u.name.toLowerCase() === normalizedName.toLowerCase());
+    if (!foundUser) throw new Error("Пользователь не найден. Зарегистрируйтесь, пожалуйста.");
+    return foundUser;
+  }
+
+  function addBook(title, author, pages) {
+    if (!currentUserId) throw new Error("Пользователь не авторизован.");
+    if (!title.trim() || !author.trim()) throw new Error("Название и автор обязательны.");
+    const pagesNum = parseInt(pages, 10);
+    if (isNaN(pagesNum) || pagesNum <= 0) throw new Error("Количество страниц должно быть положительным числом.");
+    const newBook = {
+      id: Date.now().toString() + Math.random().toString(36).substring(2, 6),
+      userId: currentUserId,
+      title: title.trim(),
+      author: author.trim(),
+      pages: pagesNum
+    };
+    books.push(newBook);
+    saveBooksToStorage();
+    return newBook;
+  }
+
+  function getUserProgress(userId) {
+    const userBooks = books.filter(book => book.userId === userId);
+    const totalBooks = userBooks.length;
+    const totalPages = userBooks.reduce((sum, book) => sum + book.pages, 0);
+    return { totalBooks, totalPages };
+  }
+
+  function getTop10Readers() {
+    const pagesMap = new Map();
+    books.forEach(book => {
+      const current = pagesMap.get(book.userId) || 0;
+      pagesMap.set(book.userId, current + book.pages);
+    });
+    const ranking = [];
+    users.forEach(user => {
+      const totalPages = pagesMap.get(user.id) || 0;
+      if (totalPages > 0) ranking.push({ userId: user.id, name: user.name, class: user.class, totalPages });
+    });
+    ranking.sort((a, b) => b.totalPages - a.totalPages);
+    return ranking.slice(0, 10);
+  }
+
+  function getUserBooks(userId) {
+    return books.filter(book => book.userId === userId).sort((a, b) => b.id - a.id);
+  }
+
+  // ==================== ОТРИСОВКА UI ====================
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
+  }
+
+  function updatePersonalUI() {
+    if (!currentUserId) return;
+    const progress = getUserProgress(currentUserId);
+    document.getElementById('totalBooksCount').innerText = progress.totalBooks;
+    document.getElementById('totalPagesCount').innerText = progress.totalPages;
+    const userBooks = getUserBooks(currentUserId);
+    const container = document.getElementById('booksListContainer');
+    if (userBooks.length === 0) {
+      container.innerHTML = '<div style="padding: 16px; text-align: center; color: #6c757d;">📭 Книг пока нет. Добавьте первую!</div>';
+      return;
+    }
+    let html = '';
+    userBooks.forEach(book => {
+      html += `<div class="book-item"><div class="book-info"><div class="book-title">${escapeHtml(book.title)}</div><div style="font-size: 0.75rem;">${escapeHtml(book.author)}</div></div><div class="book-pages">${book.pages} стр.</div></div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  function updateTop10UI() {
+    const topList = getTop10Readers();
+    const tbody = document.getElementById('rankingBody');
+    if (topList.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align: center;">Пока нет читателей со страницами 😢</td></tr>';
+      return;
+    }
+    let rows = '';
+    topList.forEach((user, idx) => {
+      rows += `<tr><td class="rank-number">${idx + 1}</td><td><strong>${escapeHtml(user.name)}</strong></td><td>${escapeHtml(user.class)}</td><td style="font-weight: 600; color: #2563eb;">${user.totalPages}</td></tr>`;
+    });
+    tbody.innerHTML = rows;
+  }
+
+  function refreshFullUI() {
+    if (!currentUserId) return;
+    const currentUser = users.find(u => u.id === currentUserId);
+    if (currentUser) {
+      document.getElementById('currentUserName').innerText = currentUser.name;
+      document.getElementById('currentUserClass').innerText = currentUser.class;
+    }
+    updatePersonalUI();
+    updateTop10UI();
+  }
+
+  // ==================== УПРАВЛЕНИЕ ЭКРАНАМИ ====================
+  function showAuthScreen() {
+    document.getElementById('authSection').style.display = 'block';
+    document.getElementById('appSection').style.display = 'none';
+    // Сброс ошибок и полей
+    document.getElementById('loginError').innerText = '';
+    document.getElementById('regError').innerText = '';
+    document.getElementById('loginName').value = '';
+    document.getElementById('regName').value = '';
+    document.getElementById('regClass').value = '';
+  }
+
+  function showAppScreen() {
+    document.getElementById('authSection').style.display = 'none';
+    document.getElementById('appSection').style.display = 'block';
+    refreshFullUI();
+    document.getElementById('addBookMsg').innerText = '';
+  }
+
+  function logout() {
+    currentUserId = null;
+    saveCurrentUserToStorage();
+    showAuthScreen();
+    // Сброс активной вкладки на "Вход"
+    setActiveTab('login');
+  }
+
+  // Переключение вкладок (вход / регистрация)
+  function setActiveTab(tab) {
+    const loginBlock = document.getElementById('loginFormBlock');
+    const registerBlock = document.getElementById('registerFormBlock');
+    const loginBtn = document.getElementById('tabLoginBtn');
+    const registerBtn = document.getElementById('tabRegisterBtn');
+    if (tab === 'login') {
+      loginBlock.classList.remove('hidden-form');
+      registerBlock.classList.add('hidden-form');
+      loginBtn.classList.add('active');
+      registerBtn.classList.remove('active');
+    } else {
+      loginBlock.classList.add('hidden-form');
+      registerBlock.classList.remove('hidden-form');
+      loginBtn.classList.remove('active');
+      registerBtn.classList.add('active');
+    }
+    // Очищаем ошибки при переключении
+    document.getElementById('loginError').innerText = '';
+    document.getElementById('regError').innerText = '';
+  }
+
+  // ==================== ОБРАБОТЧИКИ СОБЫТИЙ ====================
+  function onLoginSubmit(e) {
+    e.preventDefault();
+    const nameInput = document.getElementById('loginName');
+    const name = nameInput.value.trim();
+    const errorDiv = document.getElementById('loginError');
+    try {
+      const user = loginUser(name);
+      currentUserId = user.id;
+      saveCurrentUserToStorage();
+      showAppScreen();
+      errorDiv.innerText = '';
+    } catch (err) {
+      errorDiv.innerText = err.message;
+    }
+  }
+
+  function onRegisterSubmit(e) {
+    e.preventDefault();
+    const nameInput = document.getElementById('regName');
+    const classInput = document.getElementById('regClass');
+    const name = nameInput.value.trim();
+    const className = classInput.value.trim();
+    const errorDiv = document.getElementById('regError');
+    try {
+      const newUser = registerUser(name, className);
+      currentUserId = newUser.id;
+      saveCurrentUserToStorage();
+      showAppScreen();
+      errorDiv.innerText = '';
+    } catch (err) {
+      errorDiv.innerText = err.message;
+    }
+  }
+
+  function onAddBookSubmit(e) {
+    e.preventDefault();
+    const titleInput = document.getElementById('bookTitle');
+    const authorInput = document.getElementById('bookAuthor');
+    const pagesInput = document.getElementById('bookPages');
+    const msgDiv = document.getElementById('addBookMsg');
+    try {
+      addBook(titleInput.value, authorInput.value, pagesInput.value);
+      titleInput.value = '';
+      authorInput.value = '';
+      pagesInput.value = '';
+      msgDiv.innerText = '✅ Книга успешно добавлена!';
+      msgDiv.style.color = '#10b981';
+      refreshFullUI();
+      setTimeout(() => { if (msgDiv) msgDiv.innerText = ''; }, 2000);
+    } catch (err) {
+      msgDiv.innerText = err.message;
+      msgDiv.style.color = '#dc2626';
+    }
+  }
+
+  // ==================== ИНИЦИАЛИЗАЦИЯ ====================
+  function init() {
+    loadDataFromStorage();
+
+    // Обработчики форм
+    document.getElementById('loginForm').addEventListener('submit', onLoginSubmit);
+    document.getElementById('registerForm').addEventListener('submit', onRegisterSubmit);
+    document.getElementById('addBookForm').addEventListener('submit', onAddBookSubmit);
+    document.getElementById('logoutBtn').addEventListener('click', logout);
+
+    // Переключение вкладок
+    document.getElementById('tabLoginBtn').addEventListener('click', () => setActiveTab('login'));
+    document.getElementById('tabRegisterBtn').addEventListener('click', () => setActiveTab('register'));
+
+    // Если есть активная сессия — сразу в приложение
+    if (currentUserId && users.some(u => u.id === currentUserId)) {
+      showAppScreen();
+    } else {
+      currentUserId = null;
+      saveCurrentUserToStorage();
+      showAuthScreen();
+      setActiveTab('login'); // по умолчанию показываем вход
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
